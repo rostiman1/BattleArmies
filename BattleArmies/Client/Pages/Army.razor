@@ -1,0 +1,99 @@
+﻿@page "/army"
+@inject IUnitService UnitService
+@inject IToastService ToastService
+@attribute [Authorize]
+
+<h3>My Army</h3>
+
+@if(UnitService.Units.Count > 0)
+{
+<table class="table" >
+    @foreach (var userUnit in UnitService.MyUnits)
+    {
+        <tr>
+            <td>
+                @if(userUnit.UnitId == 1)
+                {
+                    <img src="Icons/knight.png" width="100" height="100" />
+                }
+                else if(userUnit.UnitId == 2)
+                {
+                    <img src="Icons/archer.png" width="100" height="100" />
+                }
+                else if(userUnit.UnitId == 3)
+                {
+                    <img src="Icons/mage.png" width="100" height="100" />
+                }
+                else if(userUnit.UnitId == 4)
+                {
+                    <img src="Icons/druid.png" width="100" height="100" />
+                }
+                 else if(userUnit.UnitId == 5)
+                {
+                    <img src="Icons/rogue.png" width="100" height="100" />
+                }
+                  else if(userUnit.UnitId == 6)
+                {
+                    <img src="Icons/berserker.png" width="100" height="100" />
+                }
+                  else if(userUnit.UnitId == 7)
+                {
+                    <img src="Icons/paladin.png" width="100" height="100" />
+                }
+                  else if(userUnit.UnitId == 8)
+                {
+                    <img src="Icons/shaman.png" width="100" height="100" />
+                }
+                  else if(userUnit.UnitId == 9)
+                {
+                    <img src="Icons/werewolf.png" width="100" height="100" />
+                }
+                   else if(userUnit.UnitId == 10)
+                {
+                    <img src="Icons/monk.png" width="100" height="100" />
+                }
+
+            </td>
+            <td>
+                @UnitService.Units.First(unit=>unit.Id == userUnit.UnitId).Title
+            </td>
+            <td>
+                @userUnit.HitPoints HP
+            </td>
+            <td>
+               @UnitService.Units.First(unit=>unit.Id == userUnit.UnitId).Attack Attack
+            </td>
+            <td>
+               @UnitService.Units.First(unit=>unit.Id == userUnit.UnitId).Defense Defense
+            </td>
+            <td>
+                @UnitService.Units.First(unit=>unit.Id == userUnit.UnitId).CoinsCost Coins Cost
+            </td>
+            <td>
+                <div>
+                     <button type="button" class="btn btn-danger" >DeleteHero</button>
+                </div>
+            </td>
+        </tr>
+    }  
+    </table>
+    <center>
+        <button class="btn btn-warning" @onclick="ReviveArmy">Revive your army for a 5000 coins</button>
+    </center>
+}
+else
+{
+    <span>Loading units...</span>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+        await UnitService.LoadUserFromUnitsAsync();
+    }
+    private async Task ReviveArmy()
+    {
+        await UnitService.ReviveArmy();
+    }
+}

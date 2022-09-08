@@ -1,0 +1,100 @@
+﻿@page "/leaderboard"
+@inject ILeaderboardService LeaderboardService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IBattleService BattleService
+@inject ICoinsService CoinsService
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+
+<h3>Leaderboard</h3>
+
+@if(LeaderboardService.Leaderboard == null)
+{
+    <span>Loading leaderboard..</span>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Victories</th>
+                <th>Defeats</th>
+                <th>Battles</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in LeaderboardService.Leaderboard)
+            {
+                <tr style="@GetMyStyle(item.UserId)">
+                   <td>@item.Rank</td>
+                   <td>@item.Username</td>
+                   <td>@item.Victories</td>
+                   <td>@item.Defeats</td>
+                   <td>@item.Battles</td>
+                   <td>
+                        @if(item.UserId != myUserId)
+                        {
+                            <button class="btn btn-primary" @onclick="@(() => StartBattle(item.UserId))">
+                                Fight</button>
+                        }
+                        else
+                        {
+                           <button class="btn btn-danger">Suicide</button> 
+                        }
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    int myUserId;
+    protected override async Task OnInitializedAsync()
+    {
+        await LeaderboardService.GetLeaderboard();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        myUserId = int.Parse(authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+    }
+
+    public string GetMyStyle(int userId)
+    {
+        if(userId == myUserId)
+        {
+            return "color: green; font-weight: 600;";
+        }
+        else
+        {
+            return "color: rgb(251,219,101); ; font-weight: 600;";
+        }
+    }
+    public async Task StartBattle(int opponentId)
+    {
+        Console.WriteLine($"Start battle fighting {opponentId}.");
+        var result = await BattleService.StartBattle(opponentId);   
+        if(result.RoundsFought <= 0)
+        {
+            ToastService.ShowInfo("the battle didn't take place!");
+        }
+        else if (result.IsVictory)
+        {
+            ToastService.ShowSuccess("You are victorious!");
+        }
+        else
+        {
+            ToastService.ShowWarning("You are destroyed!");
+        }
+        await LeaderboardService.GetLeaderboard();
+        await CoinsService.GetCoins();
+
+        if(result.RoundsFought > 0)
+        {
+            NavigationManager.NavigateTo("battlelog");
+        }
+    }
+}

@@ -1,0 +1,53 @@
+﻿@page "/build"
+@inject ICoinsService BananaService
+@inject IUnitService UnitService
+@inject IToastService ToastService
+@attribute [Authorize]
+
+<h3>BUILD</h3>
+
+<div class="form-group">
+    <select @bind="selectedUnitId" class="oi oi-eyedropper" >
+        @foreach (var item in UnitService.Units)
+        {
+            <option value="@item.Id">@item.Title // @item.CoinsCost Coins</option>
+        }
+    </select>
+</div>
+<div>
+    <button class="btn btn-primary" @onclick="BuildUnit">Buy Hero</button>
+</div>
+
+@code{
+    int selectedUnitId = 1;
+    bool needMoreCoins = false;
+    int counter = 0;
+    public async Task BuildUnit()
+    {
+        //var selectedUnit = UnitService.Units.FirstOrDefault(x => x.Id == selectedUnitId);
+        //if (BananaService.Coins < selectedUnit.CoinsCost)
+        //{
+        //    needMoreCoins = true;
+        //    ToastService.ShowError("Not enough coins! Grab more by clicking on the plus", ":(");
+        //    return;
+        //} 
+        //needMoreCoins = false;
+        //if(counter == 15)
+        //{
+        //    ToastService.ShowInfo($"{UnitService.MyUnits.Count} soldiers! Your army is ready go and conquer the universe","Done");
+        //    return;
+        //}
+        //else
+        //{
+        //    ToastService.ShowSuccess($"{UnitService.Units.First(x => x.Id == selectedUnitId).Title} Successfully created ");
+        //    BananaService.SpendCoins(selectedUnit.CoinsCost);
+          
+        //    counter++;
+        //}
+         await UnitService.AddUnit(selectedUnitId);
+    }
+       protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+    }
+}

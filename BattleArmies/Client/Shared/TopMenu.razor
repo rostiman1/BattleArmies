@@ -1,0 +1,33 @@
+﻿ @inject ICoinsService BananaService
+ @implements IDisposable
+
+ <AuthorizeView>
+<Authorized>
+<div class="top-menu">
+        <span class="popover-header">
+            @BananaService.Coins
+             <img src="Icons/coins.png" width="40" height="40" />
+        <AddCoins />
+        </span>
+    </div>
+    </Authorized>
+    <NotAuthorized>
+        <div>
+            <NavLink href="">Login</NavLink>
+            <NavLink href="register">Register</NavLink>
+        </div>
+    </NotAuthorized>
+   </AuthorizeView>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        BananaService.OnChange += StateHasChanged;
+    }
+    public void Dispose()
+    {
+        BananaService.OnChange -= StateHasChanged;
+    }
+
+}
